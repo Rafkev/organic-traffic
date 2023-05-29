@@ -2,7 +2,7 @@
 
 // Function to generate a unique user identifier
 export function generateUserIdentifier() {
-  const userIdentifier = localStorage.getItem("user_identifier");
+  let userIdentifier = localStorage.getItem("user_identifier");
   if (!userIdentifier) {
     userIdentifier = "user_" + Date.now() + Math.random();
     localStorage.setItem("user_identifier", userIdentifier);
