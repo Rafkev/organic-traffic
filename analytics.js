@@ -1,18 +1,23 @@
 // analytics.js
 
-// Function to generate a unique user identifier
+// Function to generate a unique user identifier using UUID
+import { v4 as uuidv4 } from 'uuid';
+
 export function generateUserIdentifier() {
   let userIdentifier = localStorage.getItem("user_identifier");
   if (!userIdentifier) {
-    userIdentifier = "user_" + Date.now() + Math.random();
+    userIdentifier = "user_" + uuidv4(); // Generate UUID
     localStorage.setItem("user_identifier", userIdentifier);
   }
   return userIdentifier;
 }
 
 // Function to set a cookie with the organic source information
-export function setOrganicSourceCookie(organicSource) {
-  document.cookie = "organic_source=" + organicSource + "; path=/";
+export function setOrganicSourceCookie(organicSource, expiryDays = 7) {
+  const expiryDate = new Date();
+  expiryDate.setDate(expiryDate.getDate() + expiryDays); // Set expiry date
+  const cookieValue = `organic_source=${organicSource}; expires=${expiryDate.toUTCString()}; path=/`;
+  document.cookie = cookieValue;
 }
 
 // Function to get the organic source from the cookie
@@ -31,18 +36,20 @@ export function getOrganicSourceFromCookie() {
 
 // Function to get the organic source
 export function getOrganicSource() {
-  var referrer = document.referrer;
-  let organicSource = "Other Organic Traffic";
+  const referrer = document.referrer;
+  const searchEngines = {
+    "google.com": "Google",
+    "bing.com": "Bing",
+    "yahoo.com": "Yahoo"
+    // Add more search engines here if needed
+  };
 
-  if (referrer.includes("google.com")) {
-    // Organic search traffic from Google
-    organicSource = "Google";
-  } else if (referrer.includes("bing.com")) {
-    // Organic search traffic from Bing
-    organicSource = "Bing";
-  } else if (referrer.includes("yahoo.com")) {
-    // Organic search traffic from Yahoo
-    organicSource = "Yahoo";
+  let organicSource = "Other Organic Traffic";
+  for (const domain in searchEngines) {
+    if (referrer.includes(domain)) {
+      organicSource = searchEngines[domain];
+      break;
+    }
   }
 
   return organicSource;
